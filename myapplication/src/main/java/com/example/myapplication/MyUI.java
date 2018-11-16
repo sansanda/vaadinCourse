@@ -13,6 +13,7 @@ import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -32,6 +33,7 @@ public class MyUI extends UI {
 	private CustomerService customerService = CustomerService.getInstance();
 	private Grid<Customer> grid = new Grid<Customer>(Customer.class);
 	private TextField filterCustomerListTextField = new TextField();
+	private CustomerForm customerForm = new CustomerForm(this);
 	
 	
     @Override
@@ -39,7 +41,6 @@ public class MyUI extends UI {
         
     	updateCustomers();
     	
-    	final VerticalLayout verticalLayout = new VerticalLayout();
         grid.setColumns("firstName","lastName","email","birthDate");
         
         filterCustomerListTextField.setPlaceholder("filter by name...");
@@ -54,14 +55,19 @@ public class MyUI extends UI {
         filteringLayout.addComponents(filterCustomerListTextField,clearFilterCustomerListTextField);
         filteringLayout.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         
-        
-        
-        verticalLayout.addComponents(filteringLayout,grid);
+        HorizontalLayout mainLayout = new HorizontalLayout(grid,customerForm);
+    	mainLayout.setSizeFull();
+    	grid.setSizeFull();
+    	mainLayout.setExpandRatio(grid, 2);
+    	mainLayout.setExpandRatio(customerForm, 1);
+    	
+        final VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.addComponents(filteringLayout,mainLayout);
         
         setContent(verticalLayout);
     }
 
-	private void updateCustomers() {
+	public void updateCustomers() {
 		List<Customer> customers = customerService.findAll(filterCustomerListTextField.getValue());	
         grid.setItems(customers);
 	}

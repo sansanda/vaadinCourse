@@ -47,13 +47,28 @@ public class MyUI extends UI {
         filterCustomerListTextField.addValueChangeListener(e->updateCustomers());
         filterCustomerListTextField.setValueChangeMode(ValueChangeMode.LAZY);
         
-        Button clearFilterCustomerListTextField = new Button(VaadinIcons.CLOSE);
-        clearFilterCustomerListTextField.setDescription("Clear the filter text");
-        clearFilterCustomerListTextField.addClickListener(e->filterCustomerListTextField.clear());
+        Button clearFilterCustomerListButton = new Button(VaadinIcons.CLOSE);
+        clearFilterCustomerListButton.setDescription("Clear the filter text");
+        clearFilterCustomerListButton.addClickListener(e->filterCustomerListTextField.clear());
+        
+        Button addCustomerButton = new Button("Adde New Customer");
+        addCustomerButton.setDescription("Add a new customer in the list of customers below");
+        addCustomerButton.addClickListener(event->{
+        	grid.asSingleSelect().clear();
+        	customerForm.setCustomer(new Customer());
+        });
+        
+        
+        
         
         CssLayout filteringLayout = new CssLayout();
-        filteringLayout.addComponents(filterCustomerListTextField,clearFilterCustomerListTextField);
+        filteringLayout.addComponents(filterCustomerListTextField,clearFilterCustomerListButton);
         filteringLayout.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+        
+        HorizontalLayout toolbarLayout = new HorizontalLayout();
+        toolbarLayout.addComponents(filteringLayout,addCustomerButton);
+        toolbarLayout.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+        
         
         HorizontalLayout mainLayout = new HorizontalLayout(grid,customerForm);
     	mainLayout.setSizeFull();
@@ -62,9 +77,26 @@ public class MyUI extends UI {
     	mainLayout.setExpandRatio(customerForm, 1);
     	
         final VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.addComponents(filteringLayout,mainLayout);
+        verticalLayout.addComponents(toolbarLayout,mainLayout);
         
         setContent(verticalLayout);
+        
+        customerForm.setVisible(false);
+        grid.asSingleSelect().addValueChangeListener(event->
+        {
+        	Customer c = event.getValue();
+        	if (c==null) 
+        	{
+        		customerForm.setVisible(false);
+        	}
+        	else {
+        		customerForm.setCustomer(c);
+        		customerForm.setVisible(true);
+        	}
+        	
+        });
+        
+        
     }
 
 	public void updateCustomers() {
